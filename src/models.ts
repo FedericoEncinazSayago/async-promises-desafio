@@ -6,30 +6,34 @@ class Contact {
 }
 
 class ContactsCollection {
+  contactsFile: string = "./src/contacts.json";
   data: Contact[] = [];
-  load() {
-    // usar la version Async (readFile)
-    const json = jsonfile.readFileSync(__dirname + "/contacts.json");
-    this.data = json;
+
+  load(): Promise<any> {
+    const promise = jsonfile.readFile(this.contactsFile);
+
+    return promise.then(obj => this.data = obj)
+            .catch(error => console.log("Error: " + error));
   }
-  getAll() {
+
+  getAll(): Contact[] {
     return this.data;
   }
-  addOne(contact: Contact) {
+
+  addOne(contact: Contact): void {
     this.data.push(contact);
   }
-  save() {
-    // usar la version Async (writeFIle)
-    jsonfile.writeFileSync(__dirname + "/contacts.json", this.data);
-  }
-  getOneById(id) {
-    const encontrado = this.data.find((contacto) => {
-      if (contacto?.id == id) {
-        return true;
-      }
-    });
 
-    return encontrado;
+  save(): Promise<any> {
+    const promise = jsonfile.writeFile(this.contactsFile, this.data);
+
+    return promise.then(res => {console.log('Write complete')})
+            .catch(error => console.log("Error: " + error));
   }
+
+  getOneById(id: number): Contact | undefined {
+    return this.data.find((contact) => contact.id === id)
+  }
+
 }
 export { ContactsCollection, Contact };
